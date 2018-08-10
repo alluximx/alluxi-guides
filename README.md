@@ -33,7 +33,7 @@ Some tasks to complete must be done by the end of the day:
 * Git flow
 * How to submit a pull request
 * What to expect from code review?
-  * Rebasing with master
+  * Merging with master
 * Github 1-on-1
   * Place comments
   * Insert code samples
@@ -41,7 +41,7 @@ Some tasks to complete must be done by the end of the day:
 
 Some rituals that work are:
 
-* Refactor (Beer) Friday and/or Tech talk
+* Refactor (Beer) Friday and/or Tech talk (Usually 15-20 min)
 * Have a pair programming session with someone on the team
 
 
