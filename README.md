@@ -1,8 +1,10 @@
-# Alluxi 
 
-This document will guide you through the process of giving a warm welcome to new members, or at least give you a nice starting point:
 
-This day is all about culture, the new members will spend the whole day with the cultural team. The purpose of this day is to explain some of our rituals, work dynamic and get to know other members. 
+ ![Alluxi Logo](https://alluxi.mx/static/app/Assets/Images/img_alluxi_horizontal_color.svg) 
+
+This document will guide new members and give them a starting point:
+
+The first two weeks are all about learning, the new members will digging into django + python courses & getting to ask questions to their peers. 
 
 Some tasks to complete must be done by the end of the day:
 
