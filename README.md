@@ -9,7 +9,7 @@ Some tasks to complete must be done by the end of the day:
 - Alluxi General tools: Email & Slack
 - Alluxi Dev tools (if applicable): Github, Codeship
 
-* What is the process a client lives with , Foresight Labs?
+* What is the process a client lives with?
   * Discovery Session
   * Design Sprint
   * Minimum Viable Product Development
