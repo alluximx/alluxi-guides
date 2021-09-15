@@ -1,6 +1,6 @@
 
 
- ![Alluxi Logo](https://alluxi.mx/static/app/Assets/Images/img_alluxi_horizontal_color.svg) 
+ ![Alluxi Logo](https://alluxi.com/static/app/Assets/Images/img_alluxi_horizontal_white.png) 
 
 This document will guide new members and give them a starting point:
 
@@ -28,7 +28,7 @@ Some tasks to complete must be done by the end of the day:
   * Schedule demo days
   * Schedule weekly standups
 
-[guides](https://github.com/gusreyes01/guides/) has the a lot of information about best practices
+[Guides](https://github.com/alluximx/guides/) has the a lot of information about best practices
 
 * Git flow
 * How to submit a pull request
