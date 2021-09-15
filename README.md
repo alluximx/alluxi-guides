@@ -1,6 +1,8 @@
 
 
- ![Alluxi Logo](https://alluxi.com/static/app/Assets/Images/img_alluxi_horizontal_white.png) 
+<p align="center">
+ <img src="https://alluxi.com/static/app/Assets/Images/img_alluxi_horizontal_white.png" style="align:center" width="340" height="138">
+</p>
 
 This document will guide new members and give them a starting point:
 
