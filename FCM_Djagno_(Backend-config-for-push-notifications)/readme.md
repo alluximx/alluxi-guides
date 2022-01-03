@@ -70,7 +70,7 @@ In the file ```config/api_router.py``` import
 
 ```from fcm_django.api.rest_framework import FCMDeviceAuthorizedViewSet```
 
-And register a new router:
+And register a new route:
 
 ```router.register("devices", FCMDeviceAuthorizedViewSet)```
 
