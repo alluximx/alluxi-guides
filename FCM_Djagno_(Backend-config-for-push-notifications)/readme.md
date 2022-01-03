@@ -1,17 +1,17 @@
-#FCM Django V-1.0.7
+# FCM Django V-1.0.7
 
 *Official documentation:*
 ```https://fcm-django.readthedocs.io/en/1.0.7/```
 
-###Pre requirements:
+### Pre requirements:
 JSON key file for firebase FCM
 
-##Installation:
+## Installation:
 In the file: ```requirements/base.txt```
 
 Add ```fcm-django==1.0.7 # https://fcm-django.readthedocs.io/en/1.0.7/```
 
-##After installation:
+## After installation:
 
 In the file ```.gitignore``` file add the name of the key file (JSON). Eg.
 ```dogit-fcm-dev.json```
@@ -19,7 +19,7 @@ In the file ```.gitignore``` file add the name of the key file (JSON). Eg.
 + The keyfile can not be tracked in the repository
 + The keyfile will be placed in the root of the project
 
-+ ###For local development:
++ ### For local development:
   + In the file ```.envs/.local/.django``` add the environment variable:
   ```GOOGLE_APPLICATION_CREDENTIALS={{keyfile in json extension}}```
   + Execute the commands
@@ -27,7 +27,7 @@ In the file ```.gitignore``` file add the name of the key file (JSON). Eg.
   docker-compose -f local.yml build
   docker-compose -f local.yml up
   ```
-+ ###For Stage and Production:
++ ### For Stage and Production:
   + In the file ```.envs/.production/.django``` add the environment variable:
     ```GOOGLE_APPLICATION_CREDENTIALS={{keyfile in json extension}}```
   + Execute the commands
@@ -37,7 +37,7 @@ In the file ```.gitignore``` file add the name of the key file (JSON). Eg.
   docker-compose -f local.yml up -d
   ```
 
-##Configuration:
+## Configuration:
 In the file: ```config/settings/base.py```
 
 Under ```THIRD_PARTY_APPS``` add:
