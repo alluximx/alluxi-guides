@@ -76,16 +76,16 @@ And register a new router:
 
 This will enable the needed endpoints for device register
 
-#Push notification
+# Push notification
 This will be the basic structure to send any push notification where needed
 
-####First import:
+#### First import:
 ```
 from fcm_django.models import FCMDevice
 from firebase_admin.messaging import Message, Notification
 ```
 
-####Notification:
+#### Notification:
 ```
 my_notification = Message(
     notification=Notification(title="{{title}}", body="{{text}}"),
