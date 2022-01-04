@@ -39,7 +39,61 @@ First we'll need a Firebase project. If you don't have one already, [create one]
 
 Then we'll need to create an Android and iOS app on our Firebase project.
 
-## Android
+# Android
+
+1. Click the Android icon or "Add app" to launch the setup workflow and complete the fields.
+2. Download the `google-services.json` file and open your RN project with Android Studio.
+3. Add the file inside the `android/app` folder.
+   ![](https://www.gstatic.com/mobilesdk/160426_mobilesdk/images/android_studio_project_panel@2x.png)
+4. Go to `android/build.gradle` and add the following:
+
+```kotlin
+buildscript {
+  repositories {
+    // Check that you have the following line (if not, add it):
+    google()  // Google's Maven repository
+
+  }
+  dependencies {
+    ...
+    // Add this line
+    classpath 'com.google.gms:google-services:4.3.10'
+
+  }
+}
+
+allprojects {
+  ...
+  repositories {
+    // Check that you have the following line (if not, add it):
+    google()  // Google's Maven repository
+
+    ...
+  }
+}
+```
+
+5. Go to `android/app/build.gradle` and add the following:
+
+```kotlin
+apply plugin: 'com.android.application'
+
+// Add this line
+apply plugin: 'com.google.gms.google-services'
+
+
+dependencies {
+  // Import the Firebase BoM
+  implementation platform('com.google.firebase:firebase-bom:29.0.3')
+
+
+  // Add the dependencies for the desired Firebase products
+  // https://firebase.google.com/docs/android/setup#available-libraries
+}
+```
+
+6.- Finally, Sync the project with Gradle files by pressing "Sync now", ![](https://www.gstatic.com/mobilesdk/160330_mobilesdk/images/android_studio_gradle_changed_butterbar@2x.png)
+or by using `File > Sync project with Gradle files` in Android Studio.
 
 # References
 
