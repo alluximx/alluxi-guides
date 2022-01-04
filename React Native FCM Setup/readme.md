@@ -35,13 +35,53 @@ We'll be using Firebase's FCM service together with the following libraries to d
     - tvOS 12
     - watchOS 6
 
-# Firebase
+## Installation
+
+#### React Native Firebase
+
+```powershell
+# Install & setup the app module
+yarn add @react-native-firebase/app
+
+# Install the messaging module
+yarn add @react-native-firebase/messaging
+
+# If you're developing your app using iOS, run this command
+cd ios/ && pod install
+```
+
+#### Notifee
+
+```powershell
+yarn add @notifee/react-native
+```
+
+#### React Navigation
+
+If you don't have react-navigation already in your poject, please follow the steps as shown in their docs: https://reactnavigation.org/docs/getting-started/
+
+#### Note on Autolinking with React Native
+
+Users on React Native 0.60+ automatically have access to "autolinking", requiring no further manual installation steps. To automatically link the package, rebuild your project:
+
+```powershell
+# For iOS
+cd ios/ && pod install --repo-update
+npx react-native run-ios
+
+# For Android
+npx react-native run-android
+```
+
+If you're using an older version of React Native without autolinking support, or wish to integrate into an existing project, you should review the steps for each of the previous installed libraries their respective [documentation](#references).
+
+### Firebase
 
 First we'll need a Firebase project. If you don't have one already, [create one](https://console.firebase.google.com/). You can [sign into Firebase](https://console.firebase.google.com/) using your Google account.
 
 Then we'll need to create an Android and iOS app on our Firebase project.
 
-# Android
+#### Android
 
 1. Click the "Add app" button and select the Android Icon to launch the setup workflow.
 2. Fill the required fields for the setup and click on "Next step".
@@ -171,3 +211,4 @@ Within the application component, metadata elements to set a default notificatio
 - https://reactnavigation.org/docs/deep-linking/
 - https://firebase.google.com/docs/android/setup
 - https://firebase.google.com/docs/ios/setup
+- https://firebase.google.com/docs/cloud-messaging/android/client
