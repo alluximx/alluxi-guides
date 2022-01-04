@@ -1,5 +1,7 @@
 # React Native FCM Configuration for Push Notifications in Android & iOS
 
+This is a guide to setup FCM Push notifications in a `bare` React Native project. If you are using Expo and you find any trouble while following the guide, please refer to the documentation links found in the [References](#references) section and follow the required steps for Expo.
+
 We'll be using Firebase's FCM service together with the following libraries to display local and push notifications:
 
 - React Navigation
@@ -41,11 +43,12 @@ Then we'll need to create an Android and iOS app on our Firebase project.
 
 # Android
 
-1. Click the Android icon or "Add app" to launch the setup workflow and complete the fields.
-2. Download the `google-services.json` file and open your RN project with Android Studio.
-3. Add the file inside the `android/app` folder.
+1. Click the "Add app" button and select the Android Icon to launch the setup workflow.
+2. Fill the required fields for the setup and click on "Next step".
+3. Download the `google-services.json` file and open your RN project with Android Studio.
+4. Add the file inside the `android/app` folder.
    ![](https://www.gstatic.com/mobilesdk/160426_mobilesdk/images/android_studio_project_panel@2x.png)
-4. Go to `android/build.gradle` and add the following:
+5. Go to `android/build.gradle` and add the following:
 
 ```kotlin
 buildscript {
@@ -68,6 +71,13 @@ allprojects {
     // Check that you have the following line (if not, add it):
     google()  // Google's Maven repository
 
+    // Notifee's Android library:
+    maven {
+      url "$rootDir/../node_modules/@notifee/react-native/android/libs"
+    }
+
+    // ... you will already have some local repositories defined ...
+
     ...
   }
 }
@@ -86,18 +96,74 @@ dependencies {
   // Import the Firebase BoM
   implementation platform('com.google.firebase:firebase-bom:29.0.3')
 
+  // Add the FCM dependency
+  implementation 'com.google.firebase:firebase-messaging'
 
-  // Add the dependencies for the desired Firebase products
-  // https://firebase.google.com/docs/android/setup#available-libraries
+  // If enabled, declare the dependency for the Firebase SDK for Google Analytics
+  implementation 'com.google.firebase:firebase-analytics'
 }
 ```
 
 6.- Finally, Sync the project with Gradle files by pressing "Sync now", ![](https://www.gstatic.com/mobilesdk/160330_mobilesdk/images/android_studio_gradle_changed_butterbar@2x.png)
 or by using `File > Sync project with Gradle files` in Android Studio.
 
-# References
+Now open your `AndroidManifest.xml` file and edit the following:
 
-If any step of this guide is not working for you or you are receiving any error during the same, please refer to the following documentation links:
+1. Make sure `launchMode` of your `MainActivity` is set to `singleTask`.
+2. Add the new `intent-filter` inside the `MainActivity` with a `VIEW` type action:
+
+```xml
+<activity
+    android:name=".MainActivity"
+    android:launchMode="singleTask">
+    <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+    </intent-filter>
+    <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <data android:scheme="my_project_name" />
+    </intent-filter>
+</activity>
+```
+
+Here, you'll have to replace with the name of your app where it says "my_project_name". This will be the same name used in the backend for navigating when opening a notification. 3. Add the following service:
+
+```xml
+<service
+    android:name=".java.MyFirebaseMessagingService"
+    android:exported="false">
+    <intent-filter>
+        <action android:name="com.google.firebase.MESSAGING_EVENT" />
+    </intent-filter>
+</service>
+```
+
+### Customizing notifications icons in Android
+
+Within the application component, metadata elements to set a default notification icon and color.
+
+```xml
+<manifest xmlns:tools="http://schemas.android.com/tools">
+  <application>
+    <!-- ... -->
+    <!-- Set custom default icon. This is used when no icon is set for incoming notification messages.
+         See README(https://goo.gl/l4GJaQ) for more. -->
+    <meta-data
+        android:name="com.google.firebase.messaging.default_notification_icon"
+        android:resource="@drawable/ic_stat_ic_notification" />
+    <!-- Set color used with incoming notification messages. This is used when no color is set for the incoming
+         notification message. See README(https://goo.gl/6BKBk7) for more. -->
+    <meta-data
+        android:name="com.google.firebase.messaging.default_notification_color"
+        android:resource="@color/colorAccent" />
+  </application>
+</manifest>
+```
+
+# References
 
 - https://rnfirebase.io/
 - https://rnfirebase.io/messaging/usage
