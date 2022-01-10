@@ -7,6 +7,7 @@ We'll be using Firebase's FCM service together with the following libraries to d
 - React Navigation
 - React Native Firebase
 - Notifee
+- uri-scheme
 
 ## Prerequisites
 
@@ -54,6 +55,12 @@ cd ios/ && pod install
 
 ```powershell
 yarn add @notifee/react-native
+```
+
+#### uri-scheme
+
+```powershell
+yarn add uri-scheme
 ```
 
 #### React Navigation
@@ -145,16 +152,23 @@ dependencies {
 }
 ```
 
-6.- Finally, Sync the project with Gradle files by pressing "Sync now",
+6. Finally, Sync the project with Gradle files by pressing "Sync now",
 
 ![](https://www.gstatic.com/mobilesdk/160330_mobilesdk/images/android_studio_gradle_changed_butterbar@2x.png)
 
 or by using `File > Sync project with Gradle files` in Android Studio.
 
+Now, we'll create  a new intent in the manifest for deep linking:  
+  
+```powershell
+// Replace "myapp" with the name of your app.
+npx uri-scheme add myapp --android
+```
+
 Now open your `AndroidManifest.xml` file and edit the following:
 
 1. Make sure `launchMode` of your `MainActivity` is set to `singleTask`.
-2. Add the new `intent-filter` inside the `MainActivity` with a `VIEW` type action:
+2. Make sure there is an `intent-filter` inside the `MainActivity` with a `VIEW` type action, if not, add it:
 
 ```xml
 <activity
@@ -168,7 +182,7 @@ Now open your `AndroidManifest.xml` file and edit the following:
         <action android:name="android.intent.action.VIEW" />
         <category android:name="android.intent.category.DEFAULT" />
         <category android:name="android.intent.category.BROWSABLE" />
-        <data android:scheme="my_project_name" />
+        <data android:scheme="myapp" /> <!-- Replace "myapp" -->
     </intent-filter>
 </activity>
 ```
@@ -225,9 +239,12 @@ Within the application component, metadata elements to set a default notificatio
 6. Open your AppDelegate.m file inside the ios folder, and add the following:
 
     - At the top of the file, import the Firebase SDK:
+    
     ```swift
     #import <Firebase.h>
+    #import <React/RCTLinkingManager.h>
     ```
+    
     - Within your existing didFinishLaunchingWithOptions method, add the following to the top of the method:
     
     ```swift
@@ -238,8 +255,24 @@ Within the application component, metadata elements to set a default notificatio
       // ...
     }
     ```
+        
+    - Above `@end` add the following:  
+    ```swift
+    - (BOOL)application:(UIApplication *)application
+       openURL:(NSURL *)url
+       options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options
+    {
+      return [RCTLinkingManager application:application openURL:url options:options];
+    }
+    ```
+7. Run the following command:  
 
+```powershell
+// replace "myapp" with the name of your app.
+npx uri-scheme add myapp --ios
+```
 
+# Usage
 
 # References
 
@@ -250,3 +283,4 @@ Within the application component, metadata elements to set a default notificatio
 - https://firebase.google.com/docs/android/setup
 - https://firebase.google.com/docs/ios/setup
 - https://firebase.google.com/docs/cloud-messaging/android/client
+- https://www.npmjs.com/package/uri-scheme
