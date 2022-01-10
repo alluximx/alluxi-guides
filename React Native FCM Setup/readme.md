@@ -87,6 +87,7 @@ Then we'll need to create an Android and iOS app on our Firebase project.
 2. Fill the required fields for the setup and click on "Next step".
 3. Download the `google-services.json` file and open your RN project with Android Studio.
 4. Add the file inside the `android/app` folder.
+
    ![](https://www.gstatic.com/mobilesdk/160426_mobilesdk/images/android_studio_project_panel@2x.png)
 5. Go to `android/build.gradle` and add the following:
 
@@ -144,7 +145,10 @@ dependencies {
 }
 ```
 
-6.- Finally, Sync the project with Gradle files by pressing "Sync now", ![](https://www.gstatic.com/mobilesdk/160330_mobilesdk/images/android_studio_gradle_changed_butterbar@2x.png)
+6.- Finally, Sync the project with Gradle files by pressing "Sync now",
+
+![](https://www.gstatic.com/mobilesdk/160330_mobilesdk/images/android_studio_gradle_changed_butterbar@2x.png)
+
 or by using `File > Sync project with Gradle files` in Android Studio.
 
 Now open your `AndroidManifest.xml` file and edit the following:
@@ -169,7 +173,9 @@ Now open your `AndroidManifest.xml` file and edit the following:
 </activity>
 ```
 
-Here, you'll have to replace with the name of your app where it says "my_project_name". This will be the same name used in the backend for navigating when opening a notification. 3. Add the following service:
+Here, you'll have to replace with the name of your app where it says "my_project_name". This will be the same name used in the backend for navigating when opening a notification. 
+
+3. Add the following service:
 
 ```xml
 <service
@@ -202,6 +208,38 @@ Within the application component, metadata elements to set a default notificatio
   </application>
 </manifest>
 ```
+
+#### iOS
+
+1. Click the "Add app" button and select the Android Icon to launch the setup workflow.
+2. The "iOS bundle ID" must match your local project bundle ID. The bundle ID can be found within the "General" tab when opening the project with Xcode.
+3. Download the `GoogleService-Info.plist` file and open the .xcworkspace file inside the ios folder with Xcode.
+4. Right click on the project name and "Add files" to the project, as demonstrated below:
+
+![](https://images.prismic.io/invertase/717983c0-63ca-4b6b-adc5-31318422ab47_add-files-via-xcode.png?auto=format)
+
+5. Select the downloaded GoogleService-Info.plist file from your computer, and ensure the "Copy items if needed" checkbox is enabled.
+
+![](https://prismic-io.s3.amazonaws.com/invertase%2f7d37e0ce-3e79-468d-930c-b7dc7bc2e291_unknown+%282%29.png)
+
+6. Open your AppDelegate.m file inside the ios folder, and add the following:
+
+    - At the top of the file, import the Firebase SDK:
+    ```swift
+    #import <Firebase.h>
+    ```
+    - Within your existing didFinishLaunchingWithOptions method, add the following to the top of the method:
+    
+    ```swift
+    - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+      // Add me --- \/
+      [FIRApp configure];
+      // Add me --- /\
+      // ...
+    }
+    ```
+
+
 
 # References
 
