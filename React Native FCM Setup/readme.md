@@ -8,6 +8,7 @@ We'll be using Firebase's FCM service together with the following libraries to d
 - React Native Firebase
 - Notifee
 - uri-scheme
+- React native async storage
 
 ## Prerequisites
 
@@ -61,6 +62,12 @@ yarn add @notifee/react-native
 
 ```powershell
 yarn add uri-scheme
+```
+
+#### Async storage
+
+```powershell
+yarn add @react-native-async-storage/async-storage
 ```
 
 #### React Navigation
@@ -189,17 +196,6 @@ Now open your `AndroidManifest.xml` file and edit the following:
 
 Here, you'll have to replace with the name of your app where it says "my_project_name". This will be the same name used in the backend for navigating when opening a notification. 
 
-3. Add the following service:
-
-```xml
-<service
-    android:name=".java.MyFirebaseMessagingService"
-    android:exported="false">
-    <intent-filter>
-        <action android:name="com.google.firebase.MESSAGING_EVENT" />
-    </intent-filter>
-</service>
-```
 
 ### Customizing notifications icons in Android
 
@@ -274,13 +270,159 @@ npx uri-scheme add myapp --ios
 
 # Usage
 
+Add the files found in the src folder of this repo to your project and do the following steps:
+
+- In the file where you have your NavigationContainer, add the following:
+
+```javascript
+// Deep links configuration
+const screenConfig = {
+    screens: {
+      Home: 'home',
+      Profile: 'profile',
+    },
+};
+const prefixes = ['myapp://', 'https://myapp/'];
+const linking = useDeepLinks(prefixes, screenConfig);
+
+return (
+<NavigationContainer linking={linking}>
+  ...
+</NavigationContainer>
+);
+```
+
+If you didn't had React navigation in your project, add the NavigationContainer tags in your App file or in the your highest order component.
+
+Refer to [this link](https://reactnavigation.org/docs/getting-started/) to know how to get started with react navigation.
+
+- In your index.js file add the following:
+
+```javascript
+import messaging from '@react-native-firebase/messaging';
+
+// Register background handler
+messaging().setBackgroundMessageHandler(async remoteMessage => {
+  console.log('Message handled in the background!', remoteMessage);
+});
+```
+
+You can add any additional behavior when handling the notification on background state here.
+
+- In your App file or wherever you need to start the process of registering the device (e.g. if you want the user to receive notifications only after the user has been logged in) add the following:  
+  
+```javascript
+const onMessage = async (remoteMessage) => {
+  // Create a default Android Notification channel, you can extend this one
+  // or add as many channels as you need for your notification management.
+  const channelId = await notifee.createChannel({
+    // Adjust this values as needed.
+    id: 'default-notification-channel',
+    name: 'Default Channel',
+    importance: AndroidImportance.DEFAULT,
+  });
+    
+  // Display the notification on foreground.
+  await notifee.displayNotification({
+    title: remoteMessage.notification.title,
+    body: remoteMessage.notification.body,
+    android: {
+      channelId,
+      // Add your custom Android configs here.
+    },
+    ios: {
+      // Add your custom iOS configs here.
+    },
+    data: remoteMessage.data,
+    remote: true,
+  });
+  
+  // Add as many additional behavior you need for 
+  // handling notifications
+  // ...
+};
+
+const onOpenNotification = (
+  remoteMessage: FirebaseMessagingTypes.RemoteMessage,
+ ) => {
+  if (remoteMessage?.data) {
+    // Expects a link variable from the notification. 
+    const link: string = remoteMessage.data.link;
+    // If it has one, it opens it using deep linking.
+    if (link) {
+      Linking.openURL(link);
+    }
+  }
+  
+  // Add as many additional behavior you need for 
+  // opening notifications
+  // ...
+};
+
+const fcm = useFCM(onMessage, onOpenNotification);
+```
+
+When you call the useFCM hook, it registers the device and saves the token at the app's local storage. It also sets up the listeners for the notifications, so you can add the behavior you need for each event. 
+
+For those listeners it will require the following parameters:
+
+| Param              | Definition                                                                            |
+|--------------------|---------------------------------------------------------------------------------------|
+| onMessage          | Defines the behavior to execute when the device receives a notification for this app. |
+| onOpenNotification | Defines the behavior to execute when the user opens a notification by tapping on it.  |
+
+Feel free to modify the useFCM hook as needed and add as many configurations or results as you prefer.
+
+## Accessing the stored Firebase Token
+
+```javascript
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+AsyncStorage.getItem("fcmToken");
+```
+
+# Testing deep links
+
+## Android
+
+To test the intent handling in Android, run the following:
+
+```powershell
+npx uri-scheme open myapp://profile --android
+```
+
+or use adb directly:
+
+```powershell
+adb shell am start -W -a android.intent.action.VIEW -d "myapp://profile" com.simpleapp
+```
+
+## iOS
+
+To test the URI on the simulator, run the following:
+
+```powershell
+npx uri-scheme open myapp://profile --ios
+```
+
+or use xcrun directly:
+
+```powershell
+xcrun simctl openurl booted myapp://profile
+```
+
+To test the URI on a real device, open Safari and type `myapp://profile`.
+
+
 # References
 
 - https://rnfirebase.io/
 - https://rnfirebase.io/messaging/usage
 - https://notifee.app/react-native/docs/installation
+- https://reactnavigation.org/docs/getting-started/
 - https://reactnavigation.org/docs/deep-linking/
 - https://firebase.google.com/docs/android/setup
 - https://firebase.google.com/docs/ios/setup
 - https://firebase.google.com/docs/cloud-messaging/android/client
 - https://www.npmjs.com/package/uri-scheme
+- https://github.com/react-native-async-storage/async-storage
