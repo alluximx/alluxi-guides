@@ -378,6 +378,8 @@ For those listeners it will require the following parameters:
 | onMessage          | Defines the behavior to execute when the device receives a notification for this app. |
 | onOpenNotification | Defines the behavior to execute when the user opens a notification by tapping on it.  |
 
+Returns fcm messaging object. Make sure your navigator is already loaded by moment you call the useFCM hook so it doesn't give you any issue when opening the notification from killed state.
+
 Feel free to modify the useFCM hook as needed and add as many configurations or results as you prefer.
 
 ## Accessing the stored Firebase Token
@@ -387,6 +389,17 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 AsyncStorage.getItem("fcmToken");
 ```
+
+# Testing FCM Notifications
+
+Go to your project in the Firebase Console and open the Cloud Messagning option from the left sidebar.
+Then click on Send your first message.
+
+It will display a form to compose a notification, so you can test the implementation directly from there.
+
+You can console.log() your fcmToken and send notifications only to your registered device.
+
+You can also send aditional params, so you can test your deep links implementation from there also by sending the "link" key with your screen path value (e.g. "myapp://profile"). 
 
 # Testing deep links
 
@@ -401,7 +414,7 @@ npx uri-scheme open myapp://profile --android
 or use adb directly:
 
 ```powershell
-adb shell am start -W -a android.intent.action.VIEW -d "myapp://profile" com.simpleapp
+adb shell am start -W -a android.intent.action.VIEW -d "myapp://profile" com.myapp
 ```
 
 ## iOS
