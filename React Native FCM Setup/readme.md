@@ -1,10 +1,14 @@
 # React Native FCM Configuration for Push Notifications in Android & iOS
 
+This is a guide to setup FCM Push notifications in a `bare` React Native project. If you are using Expo and you find any trouble while following the guide, please refer to the documentation links found in the [References](#references) section and follow the required steps for Expo.
+
 We'll be using Firebase's FCM service together with the following libraries to display local and push notifications:
 
 - React Navigation
 - React Native Firebase
 - Notifee
+- uri-scheme
+- React native async storage
 
 ## Prerequisites
 
@@ -33,147 +37,450 @@ We'll be using Firebase's FCM service together with the following libraries to d
     - tvOS 12
     - watchOS 6
 
-# Firebase
+## Installation
+
+#### React Native Firebase
+
+```powershell
+# Install & setup the app module
+yarn add @react-native-firebase/app
+
+# Install the messaging module
+yarn add @react-native-firebase/messaging
+
+# If you're developing your app using iOS, run this command
+cd ios/ && pod install
+```
+
+#### Notifee
+
+```powershell
+yarn add @notifee/react-native
+```
+
+#### uri-scheme
+
+```powershell
+yarn add uri-scheme
+```
+
+#### Async storage
+
+```powershell
+yarn add @react-native-async-storage/async-storage
+```
+
+#### React Navigation
+
+If you don't have react-navigation already in your poject, please follow the steps as shown in their docs: https://reactnavigation.org/docs/getting-started/
+
+#### Note on Autolinking with React Native
+
+Users on React Native 0.60+ automatically have access to "autolinking", requiring no further manual installation steps. To automatically link the package, rebuild your project:
+
+```powershell
+# For iOS
+cd ios/ && pod install --repo-update
+npx react-native run-ios
+
+# For Android
+npx react-native run-android
+```
+
+If you're using an older version of React Native without autolinking support, or wish to integrate into an existing project, you should review the steps for each of the previous installed libraries their respective [documentation](#references).
+
+### Firebase
 
 First we'll need a Firebase project. If you don't have one already, [create one](https://console.firebase.google.com/). You can [sign into Firebase](https://console.firebase.google.com/) using your Google account.
 
 Then we'll need to create an Android and iOS app on our Firebase project.
 
+#### Android
+
+1. Click the "Add app" button and select the Android Icon to launch the setup workflow.
+2. Fill the required fields for the setup and click on "Next step".
+3. Download the `google-services.json` file and open your RN project with Android Studio.
+4. Add the file inside the `android/app` folder.
+
+   ![](https://www.gstatic.com/mobilesdk/160426_mobilesdk/images/android_studio_project_panel@2x.png)
+5. Go to `android/build.gradle` and add the following:
+
+```kotlin
+buildscript {
+  repositories {
+    // Check that you have the following line (if not, add it):
+    google()  // Google's Maven repository
+
+  }
+  dependencies {
+    ...
+    // Add this line
+    classpath 'com.google.gms:google-services:4.3.10'
+
+  }
+}
+
+allprojects {
+  ...
+  repositories {
+    // Check that you have the following line (if not, add it):
+    google()  // Google's Maven repository
+
+    // Notifee's Android library:
+    maven {
+      url "$rootDir/../node_modules/@notifee/react-native/android/libs"
+    }
+
+    // ... you will already have some local repositories defined ...
+
+    ...
+  }
+}
+```
+
+5. Go to `android/app/build.gradle` and add the following:
+
+```kotlin
+apply plugin: 'com.android.application'
+
+// Add this line
+apply plugin: 'com.google.gms.google-services'
+
+
+dependencies {
+  // Import the Firebase BoM
+  implementation platform('com.google.firebase:firebase-bom:29.0.3')
+
+  // Add the FCM dependency
+  implementation 'com.google.firebase:firebase-messaging'
+
+  // If enabled, declare the dependency for the Firebase SDK for Google Analytics
+  implementation 'com.google.firebase:firebase-analytics'
+}
+```
+
+6. Finally, Sync the project with Gradle files by pressing "Sync now",
+
+![](https://www.gstatic.com/mobilesdk/160330_mobilesdk/images/android_studio_gradle_changed_butterbar@2x.png)
+
+or by using `File > Sync project with Gradle files` in Android Studio.
+
+Now, we'll create  a new intent in the manifest for deep linking:  
+  
+```powershell
+// Replace "myapp" with the name of your app.
+npx uri-scheme add myapp --android
+```
+
+Now open your `AndroidManifest.xml` file and do the following:
+
+1. Make sure `launchMode` of your `MainActivity` is set to `singleTask`.
+2. Make sure there is an `intent-filter` inside the `MainActivity` with a `VIEW` type action, if not, add it:
+
+```xml
+<activity
+    android:name=".MainActivity"
+    android:launchMode="singleTask">
+    <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+    </intent-filter>
+    <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <data android:scheme="myapp" /> <!-- Replace "myapp" -->
+    </intent-filter>
+</activity>
+```
+
+Here, you'll have to replace with the name of your app where it says "myapp". This will be the same name used in the backend for navigating when opening a notification. 
+
+
+### Customizing notifications icons in Android
+
+Within the application component, you can add metadata elements to set a default notification icon and color.
+
+```xml
+<manifest xmlns:tools="http://schemas.android.com/tools">
+  <application>
+    <!-- ... -->
+    <!-- Set custom default icon. This is used when no icon is set for incoming notification messages.
+         See README(https://goo.gl/l4GJaQ) for more. -->
+    <meta-data
+        android:name="com.google.firebase.messaging.default_notification_icon"
+        android:resource="@drawable/ic_stat_ic_notification" />
+    <!-- Set color used with incoming notification messages. This is used when no color is set for the incoming
+         notification message. See README(https://goo.gl/6BKBk7) for more. -->
+    <meta-data
+        android:name="com.google.firebase.messaging.default_notification_color"
+        android:resource="@color/colorAccent" />
+  </application>
+</manifest>
+```
+
+#### iOS
+
+1. Click the "Add app" button and select the Android Icon to launch the setup workflow.
+2. The "iOS bundle ID" must match your local project bundle ID. The bundle ID can be found within the "General" tab when opening the project with Xcode.
+3. Download the `GoogleService-Info.plist` file and open the .xcworkspace file inside the ios folder with Xcode.
+4. Right click on the project name and "Add files" to the project, as demonstrated below:
+
+![](https://images.prismic.io/invertase/717983c0-63ca-4b6b-adc5-31318422ab47_add-files-via-xcode.png?auto=format)
+
+5. Select the downloaded GoogleService-Info.plist file from your computer, and ensure the "Copy items if needed" checkbox is enabled.
+
+![](https://prismic-io.s3.amazonaws.com/invertase%2f7d37e0ce-3e79-468d-930c-b7dc7bc2e291_unknown+%282%29.png)
+
+6. Open your AppDelegate.m file inside the ios folder, and add the following:
+
+    - At the top of the file, import the Firebase SDK:
+    
+    ```swift
+    #import <Firebase.h>
+    #import <React/RCTLinkingManager.h>
+    ```
+    
+    - Within your existing didFinishLaunchingWithOptions method, add the following to the top of the method:
+    
+    ```swift
+    - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+      // Add me --- \/
+      [FIRApp configure];
+      // Add me --- /\
+      // ...
+    }
+    ```
+        
+    - Above `@end` add the following:  
+    ```swift
+    - (BOOL)application:(UIApplication *)application
+       openURL:(NSURL *)url
+       options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options
+    {
+      return [RCTLinkingManager application:application openURL:url options:options];
+    }
+    ```
+7. Run the following command:  
+
+```powershell
+// replace "myapp" with the name of your app.
+npx uri-scheme add myapp --ios
+```
+
+## Enable Apple Push Notifications Service on Xcode
+
+1. Click on the .xcworkspace file to open the project configuration of your app. Make sure you are on the General tab.
+
+![](https://developers.sap.com/tutorials/fiori-ios-hcpms-push-notifications/_jcr_content.github-proxy.1617172352.file/fiori-ios-hcpms-push-notifications-01.png)
+
+Make sure your Bundle Identifier is correct in the Identify section.
+
+2. Switch to the signing & Capabilities tab to make sure `Automatically manage signing` is activated and you chose the correct Signing Certificate & Team.
+
+![](https://developers.sap.com/tutorials/fiori-ios-hcpms-push-notifications/_jcr_content.github-proxy.1617172352.file/fiori-ios-hcpms-push-notifications-02.png)
+
+3. Make sure the app uses the push notification capability. For that click on the + Capability button and enable Push Notifications.
+
+![](https://developers.sap.com/tutorials/fiori-ios-hcpms-push-notifications/_jcr_content.github-proxy.1617172352.file/fiori-ios-hcpms-push-notifications-03.png)
+
+You should see the Push Notifications capability show up in the capability list for your project.
+
+![](https://developers.sap.com/tutorials/fiori-ios-hcpms-push-notifications/_jcr_content.github-proxy.1617172352.file/fiori-ios-hcpms-push-notifications-04.png)
+
+4. Go to your Apple Developer Account and click on Certificates, IDs & Profiles.
+
+![](https://developers.sap.com/tutorials/fiori-ios-hcpms-push-notifications/_jcr_content.github-proxy.1617172352.file/fiori-ios-hcpms-push-notifications-07.png)
+
+5. From there click on Keys and add a new one.
+
+6. Make sure to enable Apple Push Notifications service (APNs).
+
+7. Copy the Key ID and download the Key file.
+
+8. Go to the Firebase Console for your project and open the Project Settings (located in the Cog icon on the left sidebar).
+
+9. Click on Cloud Messaging and scroll down untill you find a section called "Apple app configuration".
+
+10. There you'll find the APNs authentication key field. Upload there the Key file you downloaded in the previous steps.
+
+Once this is ready your done and you can start testing the Push Notifications from your iPhone
+
+# Usage
+
+Add the files found in the src folder of this repo to your project and do the following steps:
+
+- In the file where you have your NavigationContainer, add the following:
+
+```javascript
+// Deep links configuration. Here you'll have to add the routing configuration
+// you'll use depending on your screens and navigators.
+// Look for detailed reference in:  
+// https://reactnavigation.org/docs/configuring-links#mapping-path-to-route-names
+const screenConfig = {
+    // This are just example routes and screens, replace them with yours.
+    screens: {
+      Home: 'home',
+      Profile: 'profile',
+    },
+};
+// Replace this prefixes with your app's name as you set them previously
+const prefixes = ['myapp://', 'https://myapp/']; 
+const linking = useDeepLinks(prefixes, screenConfig);
+
+return (
+<NavigationContainer linking={linking}>
+  ...
+</NavigationContainer>
+);
+```
+
+If you didn't had React navigation in your project, add the NavigationContainer tags in your App file or in the your highest order component.
+
+Refer to [this link](https://reactnavigation.org/docs/getting-started/) to know how to get started with react navigation.
+
+- In your index.js file add the following:
+
+```javascript
+import messaging from '@react-native-firebase/messaging';
+
+// Register background handler
+messaging().setBackgroundMessageHandler(async remoteMessage => {
+  console.log('Message handled in the background!', remoteMessage);
+});
+```
+
+You can add any additional behavior when handling the notification on background state here.
+
+- In your App file or wherever you need to start the process of registering the device (e.g. if you want the user to receive notifications only after the user has been logged in) add the following:  
+  
+```javascript
+const onMessage = async (
+  remoteMessage: FirebaseMessagingTypes.RemoteMessage,
+) => {
+  // Create a default Android Notification channel, you can extend this one
+  // or add as many channels as you need for your notification management.
+  const channelId = await notifee.createChannel({
+    // Adjust this values as needed.
+    id: 'default-notification-channel',
+    name: 'Default Channel',
+    importance: AndroidImportance.DEFAULT,
+  });
+    
+  // Display the notification on foreground.
+  await notifee.displayNotification({
+    title: remoteMessage.notification?.title,
+    body: remoteMessage.notification?.body,
+    android: {
+      channelId,
+      // Add your custom Android configs here.
+    },
+    ios: {
+      // Add your custom iOS configs here.
+    },
+    data: remoteMessage.data,
+    remote: true,
+  });
+  
+  // Add as many additional behavior you need for 
+  // handling notifications
+  // ...
+};
+
+const onOpenNotification = (
+  remoteMessage: FirebaseMessagingTypes.RemoteMessage | null,
+) => {
+  if (remoteMessage?.data) {
+    // Expects a link variable from the notification. 
+    const link: string = remoteMessage.data.link;
+    // If it has one, it opens it using deep linking.
+    if (link) {
+      Linking.openURL(link);
+    }
+  }
+  
+  // Add as many additional behavior you need for 
+  // opening notifications
+  // ...
+};
+
+const fcm = useFCM(onMessage, onOpenNotification);
+```
+
+When you call the useFCM hook, it registers the device and saves the token at the app's local storage. It also sets up the listeners for the notifications, so you can add the behavior you need for each event. 
+
+For those listeners it will require the following parameters:
+
+| Param              | Definition                                                                            |
+|--------------------|---------------------------------------------------------------------------------------|
+| onMessage          | Defines the behavior to execute when the device receives a notification for this app. |
+| onOpenNotification | Defines the behavior to execute when the user opens a notification by tapping on it.  |
+
+Returns fcm messaging object. Make sure your navigator is already loaded by moment you call the useFCM hook so it doesn't give you any issue when opening the notification from killed state.
+
+Feel free to modify the useFCM hook as needed and add as many configurations or results as you prefer.
+
+## Accessing the stored Firebase Token
+
+```javascript
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+AsyncStorage.getItem("fcmToken");
+```
+
+# Testing FCM Notifications
+
+Go to your project in the Firebase Console and open the Cloud Messagning option from the left sidebar.
+Then click on Send your first message.
+
+It will display a form to compose a notification, so you can test the implementation directly from there.
+
+You can console.log() your fcmToken and send notifications only to your registered device.
+
+You can also send aditional params, so you can test your deep links implementation from there also by sending the "link" key with your screen path value (e.g. "myapp://profile"). 
+
+# Testing deep links
+
 ## Android
 
-StackEdit stores your files in your browser, which means all your files are automatically saved locally and are accessible **offline!**
+To test the intent handling in Android, run the following:
 
-## Create files and folders
+```powershell
+npx uri-scheme open myapp://profile --android
+```
 
-The file explorer is accessible using the button in left corner of the navigation bar. You can create a new file by clicking the **New file** button in the file explorer. You can also create folders by clicking the **New folder** button.
+or use adb directly:
 
-## Switch to another file
+```powershell
+adb shell am start -W -a android.intent.action.VIEW -d "myapp://profile" com.myapp
+```
 
-All your files and folders are presented as a tree in the file explorer. You can switch from one to another by clicking a file in the tree.
+## iOS
 
-## Rename a file
+To test the URI on the simulator, run the following:
 
-You can rename the current file by clicking the file name in the navigation bar or by clicking the **Rename** button in the file explorer.
+```powershell
+npx uri-scheme open myapp://profile --ios
+```
 
-## Delete a file
+or use xcrun directly:
 
-You can delete the current file by clicking the **Remove** button in the file explorer. The file will be moved into the **Trash** folder and automatically deleted after 7 days of inactivity.
+```powershell
+xcrun simctl openurl booted myapp://profile
+```
 
-## Export a file
+To test the URI on a real device, open Safari and type `myapp://profile`.
 
-You can export the current file by clicking **Export to disk** in the menu. You can choose to export the file as plain Markdown, as HTML using a Handlebars template or as a PDF.
-
-# Synchronization
-
-Synchronization is one of the biggest features of StackEdit. It enables you to synchronize any file in your workspace with other files stored in your **Google Drive**, your **Dropbox** and your **GitHub** accounts. This allows you to keep writing on other devices, collaborate with people you share the file with, integrate easily into your workflow... The synchronization mechanism takes place every minute in the background, downloading, merging, and uploading file modifications.
-
-There are two types of synchronization and they can complement each other:
-
-- The workspace synchronization will sync all your files, folders and settings automatically. This will allow you to fetch your workspace on any other device.
-
-  > To start syncing your workspace, just sign in with Google in the menu.
-
-- The file synchronization will keep one file of the workspace synced with one or multiple files in **Google Drive**, **Dropbox** or **GitHub**.
-  > Before starting to sync files, you must link an account in the **Synchronize** sub-menu.
-
-## Open a file
-
-You can open a file from **Google Drive**, **Dropbox** or **GitHub** by opening the **Synchronize** sub-menu and clicking **Open from**. Once opened in the workspace, any modification in the file will be automatically synced.
-
-## Save a file
-
-You can save any file of the workspace to **Google Drive**, **Dropbox** or **GitHub** by opening the **Synchronize** sub-menu and clicking **Save on**. Even if a file in the workspace is already synced, you can save it to another location. StackEdit can sync one file with multiple locations and accounts.
-
-## Synchronize a file
-
-Once your file is linked to a synchronized location, StackEdit will periodically synchronize it by downloading/uploading any modification. A merge will be performed if necessary and conflicts will be resolved.
-
-If you just have modified your file and you want to force syncing, click the **Synchronize now** button in the navigation bar.
-
-> **Note:** The **Synchronize now** button is disabled if you have no file to synchronize.
-
-## Manage file synchronization
-
-Since one file can be synced with multiple locations, you can list and manage synchronized locations by clicking **File synchronization** in the **Synchronize** sub-menu. This allows you to list and remove synchronized locations that are linked to your file.
-
-# Publication
-
-Publishing in StackEdit makes it simple for you to publish online your files. Once you're happy with a file, you can publish it to different hosting platforms like **Blogger**, **Dropbox**, **Gist**, **GitHub**, **Google Drive**, **WordPress** and **Zendesk**. With [Handlebars templates](http://handlebarsjs.com/), you have full control over what you export.
-
-> Before starting to publish, you must link an account in the **Publish** sub-menu.
-
-## Publish a File
-
-You can publish your file by opening the **Publish** sub-menu and by clicking **Publish to**. For some locations, you can choose between the following formats:
-
-- Markdown: publish the Markdown text on a website that can interpret it (**GitHub** for instance),
-- HTML: publish the file converted to HTML via a Handlebars template (on a blog for example).
-
-## Update a publication
-
-After publishing, StackEdit keeps your file linked to that publication which makes it easy for you to re-publish it. Once you have modified your file and you want to update your publication, click on the **Publish now** button in the navigation bar.
-
-> **Note:** The **Publish now** button is disabled if your file has not been published yet.
-
-## Manage file publication
-
-Since one file can be published to multiple locations, you can list and manage publish locations by clicking **File publication** in the **Publish** sub-menu. This allows you to list and remove publication locations that are linked to your file.
 
 # References
-
-If any step of this guide is not working for you or you are receiving any error during the same, please refer to the following documentation links:
 
 - https://rnfirebase.io/
 - https://rnfirebase.io/messaging/usage
 - https://notifee.app/react-native/docs/installation
+- https://reactnavigation.org/docs/getting-started/
 - https://reactnavigation.org/docs/deep-linking/
 - https://firebase.google.com/docs/android/setup
 - https://firebase.google.com/docs/ios/setup
-
-## SmartyPants
-
-SmartyPants converts ASCII punctuation characters into "smart" typographic punctuation HTML entities. For example:
-
-|                  | ASCII                           | HTML                          |
-| ---------------- | ------------------------------- | ----------------------------- |
-| Single backticks | `'Isn't this fun?'`             | 'Isn't this fun?'             |
-| Quotes           | `"Isn't this fun?"`             | "Isn't this fun?"             |
-| Dashes           | `-- is en-dash, --- is em-dash` | -- is en-dash, --- is em-dash |
-
-## KaTeX
-
-You can render LaTeX mathematical expressions using [KaTeX](https://khan.github.io/KaTeX/):
-
-The _Gamma function_ satisfying $\Gamma(n) = (n-1)!\quad\forall n\in\mathbb N$ is via the Euler integral
-
-$$
-\Gamma(z) = \int_0^\infty t^{z-1}e^{-t}dt\,.
-$$
-
-> You can find more information about **LaTeX** mathematical expressions [here](http://meta.math.stackexchange.com/questions/5020/mathjax-basic-tutorial-and-quick-reference).
-
-## UML diagrams
-
-You can render UML diagrams using [Mermaid](https://mermaidjs.github.io/). For example, this will produce a sequence diagram:
-
-```mermaid
-sequenceDiagram
-Alice ->> Bob: Hello Bob, how are you?
-Bob-->>John: How about you John?
-Bob--x Alice: I am good thanks!
-Bob-x John: I am good thanks!
-Note right of John: Bob thinks a long<br/>long time, so long<br/>that the text does<br/>not fit on a row.
-
-Bob-->Alice: Checking with John...
-Alice->John: Yes... John, how are you?
-```
-
-And this will produce a flow chart:
-
-```mermaid
-graph LR
-A[Square Rect] -- Link text --> B((Circle))
-A --> C(Round Rect)
-B --> D{Rhombus}
-C --> D
-```
+- https://firebase.google.com/docs/cloud-messaging/android/client
+- https://www.npmjs.com/package/uri-scheme
+- https://github.com/react-native-async-storage/async-storage
