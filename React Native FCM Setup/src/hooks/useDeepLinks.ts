@@ -2,6 +2,11 @@
  * This file contains a hook which receives some params
  * to use the deep links and navigate the user with
  * the provided configuration when opening them.
+ *
+ * You can edit it to extend its functionality or
+ * use another linking integration or behavior as needed.
+ * Ref:
+ * https://reactnavigation.org/docs/deep-linking/#third-party-integrations
  */
 
 import React from "react";
