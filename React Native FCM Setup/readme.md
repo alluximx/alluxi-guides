@@ -172,7 +172,7 @@ Now, we'll create  a new intent in the manifest for deep linking:
 npx uri-scheme add myapp --android
 ```
 
-Now open your `AndroidManifest.xml` file and edit the following:
+Now open your `AndroidManifest.xml` file and do the following:
 
 1. Make sure `launchMode` of your `MainActivity` is set to `singleTask`.
 2. Make sure there is an `intent-filter` inside the `MainActivity` with a `VIEW` type action, if not, add it:
@@ -194,12 +194,12 @@ Now open your `AndroidManifest.xml` file and edit the following:
 </activity>
 ```
 
-Here, you'll have to replace with the name of your app where it says "my_project_name". This will be the same name used in the backend for navigating when opening a notification. 
+Here, you'll have to replace with the name of your app where it says "myapp". This will be the same name used in the backend for navigating when opening a notification. 
 
 
 ### Customizing notifications icons in Android
 
-Within the application component, metadata elements to set a default notification icon and color.
+Within the application component, you can add metadata elements to set a default notification icon and color.
 
 ```xml
 <manifest xmlns:tools="http://schemas.android.com/tools">
@@ -275,14 +275,19 @@ Add the files found in the src folder of this repo to your project and do the fo
 - In the file where you have your NavigationContainer, add the following:
 
 ```javascript
-// Deep links configuration
+// Deep links configuration. Here you'll have to add the routing configuration
+// you'll use depending on your screens and navigators.
+// Look for detailed reference in:  
+// https://reactnavigation.org/docs/configuring-links#mapping-path-to-route-names
 const screenConfig = {
+    // This are just example routes and screens, replace them with yours.
     screens: {
       Home: 'home',
       Profile: 'profile',
     },
 };
-const prefixes = ['myapp://', 'https://myapp/'];
+// Replace this prefixes with your app's name as you set them previously
+const prefixes = ['myapp://', 'https://myapp/']; 
 const linking = useDeepLinks(prefixes, screenConfig);
 
 return (
