@@ -1,7 +1,7 @@
 /**
  * This file contains a hook which receives some params
  * to use the deep links and navigate the user with
- * the provided configuration.
+ * the provided configuration when opening them.
  */
 
 import React from "react";
