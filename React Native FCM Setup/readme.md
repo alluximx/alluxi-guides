@@ -268,6 +268,44 @@ Within the application component, you can add metadata elements to set a default
 npx uri-scheme add myapp --ios
 ```
 
+## Enable Apple Push Notifications Service on Xcode
+
+1. Click on the .xcworkspace file to open the project configuration of your app. Make sure you are on the General tab.
+
+![](https://developers.sap.com/tutorials/fiori-ios-hcpms-push-notifications/_jcr_content.github-proxy.1617172352.file/fiori-ios-hcpms-push-notifications-01.png)
+
+Make sure your Bundle Identifier is correct in the Identify section.
+
+2. Switch to the signing & Capabilities tab to make sure `Automatically manage signing` is activated and you chose the correct Signing Certificate & Team.
+
+![](https://developers.sap.com/tutorials/fiori-ios-hcpms-push-notifications/_jcr_content.github-proxy.1617172352.file/fiori-ios-hcpms-push-notifications-02.png)
+
+3. Make sure the app uses the push notification capability. For that click on the + Capability button and enable Push Notifications.
+
+![](https://developers.sap.com/tutorials/fiori-ios-hcpms-push-notifications/_jcr_content.github-proxy.1617172352.file/fiori-ios-hcpms-push-notifications-03.png)
+
+You should see the Push Notifications capability show up in the capability list for your project.
+
+![](https://developers.sap.com/tutorials/fiori-ios-hcpms-push-notifications/_jcr_content.github-proxy.1617172352.file/fiori-ios-hcpms-push-notifications-04.png)
+
+4. Go to your Apple Developer Account and click on Certificates, IDs & Profiles.
+
+![](https://developers.sap.com/tutorials/fiori-ios-hcpms-push-notifications/_jcr_content.github-proxy.1617172352.file/fiori-ios-hcpms-push-notifications-07.png)
+
+5. From there click on Keys and add a new one.
+
+6. Make sure to enable Apple Push Notifications service (APNs).
+
+7. Copy the Key ID and download the Key file.
+
+8. Go to the Firebase Console for your project and open the Project Settings (located in the Cog icon on the left sidebar).
+
+9. Click on Cloud Messaging and scroll down untill you find a section called "Apple app configuration".
+
+10. There you'll find the APNs authentication key field. Upload there the Key file you downloaded in the previous steps.
+
+Once this is ready your done and you can start testing the Push Notifications from your iPhone
+
 # Usage
 
 Add the files found in the src folder of this repo to your project and do the following steps:
