@@ -317,7 +317,9 @@ You can add any additional behavior when handling the notification on background
 - In your App file or wherever you need to start the process of registering the device (e.g. if you want the user to receive notifications only after the user has been logged in) add the following:  
   
 ```javascript
-const onMessage = async (remoteMessage) => {
+const onMessage = async (
+  remoteMessage: FirebaseMessagingTypes.RemoteMessage,
+) => {
   // Create a default Android Notification channel, you can extend this one
   // or add as many channels as you need for your notification management.
   const channelId = await notifee.createChannel({
@@ -329,8 +331,8 @@ const onMessage = async (remoteMessage) => {
     
   // Display the notification on foreground.
   await notifee.displayNotification({
-    title: remoteMessage.notification.title,
-    body: remoteMessage.notification.body,
+    title: remoteMessage.notification?.title,
+    body: remoteMessage.notification?.body,
     android: {
       channelId,
       // Add your custom Android configs here.
@@ -348,8 +350,8 @@ const onMessage = async (remoteMessage) => {
 };
 
 const onOpenNotification = (
-  remoteMessage: FirebaseMessagingTypes.RemoteMessage,
- ) => {
+  remoteMessage: FirebaseMessagingTypes.RemoteMessage | null,
+) => {
   if (remoteMessage?.data) {
     // Expects a link variable from the notification. 
     const link: string = remoteMessage.data.link;
