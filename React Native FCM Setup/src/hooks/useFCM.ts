@@ -11,7 +11,7 @@ const useFCM = (
 		remoteMessage: FirebaseMessagingTypes.RemoteMessage
 	) => Promise<void>,
 	onOpenNotification: (
-		remoteMessage: FirebaseMessagingTypes.RemoteMessage
+		remoteMessage: FirebaseMessagingTypes.RemoteMessage | null
 	) => void
 ) => {
 	React.useEffect(() => {
@@ -21,7 +21,7 @@ const useFCM = (
 		const unsubscribe = messaging().onMessage(onMessage);
 		// Triggered when opening notification from Foreground state.
 		notifee.onForegroundEvent(({ type, detail }) => {
-			if (type === EventType.PRESS) {
+			if (type === EventType.PRESS && detail.notification) {
 				onOpenNotification(detail.notification);
 			}
 		});
