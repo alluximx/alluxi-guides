@@ -221,7 +221,7 @@ Within the application component, you can add metadata elements to set a default
 
 #### iOS
 
-1. Click the "Add app" button and select the Android Icon to launch the setup workflow.
+1. Click the "Add app" button and select the iOS+ Icon to launch the setup workflow.
 2. The "iOS bundle ID" must match your local project bundle ID. The bundle ID can be found within the "General" tab when opening the project with Xcode.
 3. Download the `GoogleService-Info.plist` file and open the .xcworkspace file inside the ios folder with Xcode.
 4. Right click on the project name and "Add files" to the project, as demonstrated below:
