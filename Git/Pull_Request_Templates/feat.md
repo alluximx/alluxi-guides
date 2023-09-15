@@ -1,24 +1,56 @@
-## New Feature Ticket
-* [{{BOARD}}-{{TASK}}](https://alluxi.atlassian.net/browse/{{BOARD}}-{{TASK}})
+## Related Tickets & Documents
+- [EXAMPLE-123](https://alluxi.atlassian.net/)
 
-## Acceptance Testing Steps
-1. In your local.... 
-2. Endpoint...
-3. Payload...
+## What type of PR is this? (check all applicable)
+<!-- Put "x" to mark a checkbox. -->
+- [ ] Refactor
+- [ ] Feature
+- [ ] Bug Fix
+- [ ] Optimization
+- [ ] Documentation Update
 
-## Success Response Payload:
+## Description
+Example
+
+## QA Instructions
+1. Example
+2. Example
+
+
+<!-- Frontend section. Remove it if not applicable. -->
+### UI design: Screens & Previews
+<!-- Type: Desktop or Mobile -->
+### [Desktop] Screen name example
+#### 🖼️ Preview
+<!-- Your preview here -->
+<!-- Add more screens here -->
+
+<!-- Backend section. Remove it if not applicable. -->
+### Endpoints: Payloads & Responses
+<!--Type of endpoint: POST, GET, PUT, PATCH, DELETE. -->
+### [POST] Endpoint name example
+<!-- Remove payload if not applicable -->
+#### ⬆️ Payload
 ```json
   {
-      "message": "value"
+      "Example": true
   }
 ```
 
-## Failure Response Payload:
+#### ✅ Success response
 ```json
   {
-      "message": "value"
+      "Example": true
   }
 ```
 
-## Additional Notes
-_Anything the team should know about your code. Examples could be unique work-around you had to employ to make the code you wrote run that are unorthodox or unusual._
+#### ❌ Failure response
+```json
+  {
+      "detail": false
+  }
+```
+<!-- Add more endpoints here -->
+
+## [Optional] Are there any post deployment tasks we need to perform?
+- Example
