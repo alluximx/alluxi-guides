@@ -1,7 +1,7 @@
 
 
 <p align="center">
- <img src="[https://alluxi.com/static/app/Assets/Images/img_alluxi_horizontal_white.png](https://www.alluxi.com/static/media/logo.21593076d2213ffc5962e1c4ebb2d7f4.svg)](https://www.alluxi.com/static/media/logo.21593076d2213ffc5962e1c4ebb2d7f4.svg" style="align:center" width="340" height="138">
+ <img src="https://www.alluxi.com/static/media/logo.21593076d2213ffc5962e1c4ebb2d7f4.svg" style="align:center" width="340" height="138">
 </p>
 
 This document will guide new members and give them a starting point:
